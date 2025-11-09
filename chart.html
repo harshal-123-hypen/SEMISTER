@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Marks Dashboard - Data Visualizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f9fafb; color: #333; }
+    /* Navbar */
+    .navbar {
+      height: 70px;
+      width: 100%;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: 0.3s;
+    }
+    .navbar.shrink {
+      height: 55px;
+      padding: 0 30px;
+      background: #f1f5f9;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-weight: 700;
+      font-size: 24px;
+      color: #1e3a8a;
+    }
+    .logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    .nav-links a {
+      margin-left: 30px;
+      text-decoration: none;
+      font-weight: 500;
+      color: #374151;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: #2563eb; }
+    .nav-links a.active { color: #2563eb; }
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+      background: linear-gradient(to right, #2563eb, #60a5fa);
+      color: white;
+      border-bottom-left-radius: 50px;
+      border-bottom-right-radius: 50px;
+    }
+    .hero h1 { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; }
+    .hero p { font-size: 1.2rem; max-width: 600px; margin: auto; opacity: 0.9; }
+    /* Section Title */
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 60px 0 30px;
+      color: #1e3a8a;
+      position: relative;
+      display: inline-block;
+    }
+    .section-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -10px;
+      width: 100%;
+      height: 3px;
+      background: #2563eb;
+      border-radius: 2px;
+    }
+    /* Dashboard Content */
+    .dashboard-container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+    .form-div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    input {
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      outline: none;
+      font-size: 14px;
+      width: 200px;
+      font-family: 'Inter', sans-serif;
+    }
+    input::placeholder { color: #9ca3af; }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(to right, #2563eb, #60a5fa);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    #search {
+      padding: 10px 15px;
+      width: 350px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 25px;
+      font-size: 14px;
+      display: block;
+      margin: 0 auto 25px;
+      font-family: 'Inter', sans-serif;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    th, td {
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+    th {
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    tbody tr { transition: all 0.3s ease; }
+    tbody tr:hover { background: rgba(37, 99, 235, 0.05); transform: scale(1.01); }
+    .marks-high { color: #10b981; font-weight: 700; }
+    .marks-low { color: #ef4444; font-weight: 700; }
+    .marks-mid { color: #f59e0b; font-weight: 700; }
+    #downloadBtn {
+      display: block;
+      margin: 25px auto;
+      padding: 12px 28px;
+      background: linear-gradient(to right, #10b981, #059669);
+    }
+    #downloadBtn:hover { box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+    @media (max-width: 850px) {
+      .form-div { flex-direction: column; align-items: center; }
+      input { width: 90%; }
+      #search { width: 90%; }
+      table { width: 100%; }
+    }
+    /* Footer */
+    footer {
+      margin-top: 60px;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      padding: 20px;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar" id="navbar">
+    <div class="logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/3063/3063181.png" alt="Data Visualizer Logo">
+      Data Visualizer
+    </div>
+    <div class="nav-links">
+      <a href="attend.html">Home</a>
+      <a href="semfeature.html">Features</a>
+      
+    </div>
+  </div>
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Student Marks Dashboard</h1>
+    <p>Track and visualize student performance with interactive tools.</p>
+  </section>
+  <!-- Dashboard -->
+  <div class="dashboard-container">
+    <div class="form-div">
+      <input type="text" id="name" placeholder="Student Name" oninput="validateName(this)">
+      <input type="number" id="marks" placeholder="Marks (0-100)" min="0" max="100">
+      <button onclick="addStudent()">Add Student</button>
+    </div>
+
+    <input type="text" id="search" placeholder="Search Name">
+
+    <table id="studentTable">
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Marks</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button id="downloadBtn" onclick="downloadPDF()">Download PDF</button>
+  </div>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Data Visualizer. All rights reserved.</p>
+  </footer>
+
+  <!-- JS Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+  <script>
+    let students = [];
+    let rollCounter = 1;
+
+    // Navbar shrink on scroll
+    window.addEventListener("scroll", function() {
+      const navbar = document.getElementById("navbar");
+      if (window.scrollY > 50) {
+        navbar.classList.add("shrink");
+      } else {
+        navbar.classList.remove("shrink");
+      }
+    });
+
+    // Remove numbers from name
+    function validateName(input) {
+      input.value = input.value.replace(/[0-9]/g,''); 
+    }
+
+    // Add student
+    function addStudent() {
+      const name = document.getElementById("name").value.trim();
+      const marks = Number(document.getElementById("marks").value);
+
+      if(!name || (!marks && marks!==0)) { alert("Fill all fields correctly!"); return; }
+      if(marks <0 || marks>100){ alert("Marks must be 0-100"); return; }
+
+      students.push({ roll: rollCounter++, name, marks });
+      document.getElementById("name").value = "";
+      document.getElementById("marks").value = "";
+      updateTable();
+    }
+
+    // Update table sorted by marks descending
+    function updateTable() {
+      const tbody = document.querySelector("#studentTable tbody");
+      tbody.innerHTML = "";
+
+      // Sort by marks descending
+      students.sort((a,b) => b.marks - a.marks);
+
+      const filterValue = document.getElementById("search").value.toLowerCase();
+      const filtered = students.filter(s => s.name.toLowerCase().includes(filterValue));
+
+      const maxMarks = Math.max(...students.map(s => s.marks));
+      const minMarks = Math.min(...students.map(s => s.marks));
+
+      filtered.forEach(s => {
+        let arrow = "→";
+        let cssClass = "marks-mid";
+
+        if(s.marks === maxMarks){ arrow="↑"; cssClass="marks-high"; }
+        else if(s.marks === minMarks){ arrow="↓"; cssClass="marks-low"; }
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${s.roll}</td>
+                        <td>${s.name}</td>
+                        <td class="${cssClass}">${s.marks} ${arrow}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", updateTable);
+
+    // Download PDF
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p','pt','a4');
+      const table = document.getElementById("studentTable");
+
+      const canvas = await html2canvas(table, { scale: 2 });
+      const imgData = canvas.toDataURL('image/png');
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const imgProps = doc.getImageProperties(imgData);
+      const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+
+      doc.addImage(imgData, 'PNG', 20, 20, pageWidth-40, pdfHeight);
+      doc.save("Student_Marks_Dashboard.pdf");
+    }
+  </script>
+</body>
+</html>
